@@ -1,0 +1,118 @@
+name: AKS
+
+on: 
+  workflow_call:
+    inputs:
+      Registry:
+        description: 'Name of the ACR registry'     
+        required: true
+        type: string
+      Namespace:
+        description: 'Kubernetes Namespace'     
+        required: true
+        type: string
+      ResourceGroup:
+        description: 'Kubernetes Namespace'     
+        required: true
+        type: string
+      K8Cluster:
+        description: 'Kubernetes cluster name'     
+        required: true
+        type: string
+      Environment:
+        description: 'Define the  Environment: Prod, Acc, Test, Dev'     
+        required: true
+        type: string
+      ServiceName:
+        description: 'Name of the service'     
+        required: true
+        type: string
+      SolutionName:
+        description: 'Name of the solution'     
+        required: true
+        type: string
+      FullImagePath:
+        description: 'Name of the Image in the Container Registry'     
+        required: true
+        type: string
+    secrets:
+      ACR_User:
+        required: true
+      ACR_Password:
+        required: true
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_CLIENT_SECRET:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+
+env:
+  configMap: ${{ inputs.ServiceName }}Settings
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: configs
+
+      - name: Login to ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.Registry }}
+          username: ${{ secrets.ACR_User }}
+          password: ${{ secrets.ACR_Password }}
+  
+      - uses: azure/setup-kubectl@v2.0
+
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+
+      - uses: azure/aks-set-context@v2
+        with:
+           resource-group: '${{ inputs.ResourceGroup }}'
+           cluster-name: '${{ inputs.K8Cluster }}'
+
+      - name: Create namespace.
+        run: kubectl create namespace ${{ inputs.Namespace }}
+        continue-on-error: true 
+
+      - name: Ensure configmap name is in lower case!
+        run: echo "::set-output name=configMapName::$(echo ${{ env.configMap }} | tr [:upper:] [:lower:])"
+        id: configMap
+
+      - name: Delete configmap if exist.
+        run: kubectl delete configmap  ${{ steps.configMap.outputs.configMapName }} -n ${{ inputs.Namespace }}
+        continue-on-error: true 
+
+      - name: Files to add in the configMap.
+        run: echo "::set-output name=configMapFiles::--from-file ./Service/Configs/appsettings.json --from-file ./Service/Configs/appsettings.${{ inputs.Environment }}.json $([ -e ./Service/Configs/reverseproxy.json ] && echo '--from-file ./Service/Configs/reverseproxy.json --from-file ./Service/Configs/reverseproxy.${{ inputs.Environment }}.json' || echo '')"
+        id: filesToConfigMap
+
+      - name: Create/update configmap
+        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} ${{ steps.filesToConfigMap.outputs.configMapFiles }}
+
+      - name: Prepare the Deploy file => environment.
+        uses: bluwy/substitute-string-action@v1
+        with:
+          _input-file: 'deploy.yml'
+          _output-file: 'deploy.yml'
+          _format-key: '#key#'
+          environment: '${{ inputs.Environment }}'
+
+      - name: Prepare the Deploy file => image tag.
+        uses: bluwy/substitute-string-action@v1
+        id: text
+        with:
+          _input-file: 'deploy.yml'
+          _output-file: 'deploy.yml'
+          _format-key: '#key#'
+          fullImagePath: '${{ inputs.FullImagePath }}'
+      
+      - name: Deploy
+        run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}

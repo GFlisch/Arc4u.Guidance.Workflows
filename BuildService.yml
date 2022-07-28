@@ -1,0 +1,66 @@
+name: Build .NET
+
+on: 
+  workflow_call:
+    inputs:
+      serviceName:
+        description: 'Name of the service'     
+        required: true
+        type: string
+      solutionName:
+        description: 'Name of the solution'     
+        required: true
+        type: string
+      dotNet:
+        description: 'Version of the .Net runtime'     
+        required: true
+        type: string
+env:
+  hostRoot: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host'
+  host: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+           dotnet-version: ${{ github.event.inputs.dotNet }}.x
+    
+      - name: Install dependencies
+        run: dotnet restore ${{ env.host }}
+         
+      - name: Build
+        run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} --no-restore -o ./Service
+
+      - name: Substitue Dockerfile
+        uses: bluwy/substitute-string-action@v1
+        id: sub
+        with:
+          _input-file: './src/BE/Dockerfile'
+          _format-key: '%%key%%'
+          appName: ${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.dll
+      
+      - name: Create Dockerfile
+        uses: DamianReeves/write-file-action@v1.0
+        with:
+          path: ./Dockerfile
+          contents: ${{ steps.sub.outputs.result }}
+          write-mode: append
+
+      - name: Copy deploy file
+        run: cp ./src/BE/${{ github.event.inputs.serviceName }}/deploy.yml ./deploy.yml  
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: |
+            ./Service
+            ./Dockerfile
+            ./deploy.yml
+          retention-days: 1
