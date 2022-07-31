@@ -1,4 +1,4 @@
-#Build Service
+# Build Service
 
 Build a DOTNET Arc4u service and save it in an artifact.
 Don't run any test or Sonrqube analyzis.

@@ -4,11 +4,11 @@ on:
   workflow_call:
     inputs:
       DockerImage:
-        description: 'Docke image name use to store in a container'
+        description: 'Docker image name use to store in a container'
         required: true
         type: string
       Registry:
-        description: 'Name of the ACR registry'     
+        description: 'Name of the container registry'     
         required: true
         type: string
       ServiceName:
@@ -24,9 +24,9 @@ on:
         required: true
         type: string
     secrets:
-      ACR_User:
+      CR_User:
         required: true
-      ACR_Password:
+      CR_Password:
         required: true
 jobs:
   build:
@@ -56,8 +56,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ${{ inputs.Registry }}
-          username: ${{ secrets.ACR_User }}
-          password: ${{ secrets.ACR_Password }}
+          username: ${{ secrets.CR_User }}
+          password: ${{ secrets.CR_Password }}
 
       - name: Build and publish the docker image.
         run: |
