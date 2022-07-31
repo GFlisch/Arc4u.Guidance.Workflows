@@ -11,18 +11,6 @@ on:
         description: 'Name of the container registry'     
         required: true
         type: string
-      ServiceName:
-        description: 'Name of the service'     
-        required: true
-        type: string
-      SolutionName:
-        description: 'Name of the solution'     
-        required: true
-        type: string
-      Environment:
-        description: 'Define the  Environment: Prod, Acc, Test, Dev'     
-        required: true
-        type: string
     secrets:
       CR_User:
         required: true

@@ -20,3 +20,8 @@ Input parameters:
 - serviceName: The name of the micro-service.
 - dotNet: The version if the .Net runtime 6.0 or 6. The workflow will add a .*!
 
+The yaml file will build a service on this specific path:  
+.\\BE\\{{ ServiceName }}\\{{ SolutionName }}.{{ ServiceName }}.Host\\{{ SolutionName }}.{{ ServiceName }}.Host.csproj
+
+If the structure is different, the service project will not be found.
+
