@@ -18,4 +18,4 @@ This means that all the services used in a solution are in this case stored in t
 
 The registry is the container registry identifier used to access it.
 
-
+The CR_User and CR_Password are the secrets to access your container registry.
