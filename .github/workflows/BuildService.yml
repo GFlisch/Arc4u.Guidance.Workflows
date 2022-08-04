@@ -38,18 +38,18 @@ jobs:
 
       - name: Echo testFilter
         run: |
-          echo "testFilter parameter is set to : ${{ github.event.inputs.testFilter }}"
+          echo "testFilter parameter is set to : ${{ inputs.testFilter }}"
 
       - name: Run Test projects matching *UnitTest.csproj
         if: inputs.testFilter == ''
         run: |
-            Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
         shell: pwsh            
 
-      - name: Run Test projects matching *UnitTest.csproj with filter ${{ github.event.inputs.testFilter }}
+      - name: Run Test projects matching *UnitTest.csproj with filter ${{ inputs.testFilter }}
         if: inputs.testFilter != ''
         run: |
-            Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
+            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f '${{ inputs.testFilter }}' }
         shell: pwsh            
 
       - name: Build
