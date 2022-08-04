@@ -40,13 +40,13 @@ jobs:
         run: dotnet restore ${{ env.host }}
 
       - name: Run Test projects matching *UnitTest.csproj
-        if: ${{ github.event.inputs.testFilter == '' }}
+        if: github.event.inputs.testFilter == ''
         run: |
             Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
         shell: pwsh            
 
       - name: Run Test projects matching *UnitTest.csproj with filter ${{ github.event.inputs.testFilter }}
-        if: ${{ github.event.inputs.testFilter != '' }}
+        if: github.event.inputs.testFilter != ''
         run: |
             Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
         shell: pwsh            
