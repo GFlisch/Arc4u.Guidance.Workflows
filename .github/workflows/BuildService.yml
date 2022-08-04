@@ -35,9 +35,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}.x
-    
-      - name: Install dependencies
-        run: dotnet restore ${{ env.host }}
 
       - name: Run Test projects matching *UnitTest.csproj
         if: github.event.inputs.testFilter == ''
@@ -52,7 +49,7 @@ jobs:
         shell: pwsh            
 
       - name: Build
-        run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} --no-restore -o ./Service
+        run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
 
       - name: Substitue Dockerfile
         uses: bluwy/substitute-string-action@v1
