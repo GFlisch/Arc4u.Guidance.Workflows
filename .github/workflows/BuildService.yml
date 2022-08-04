@@ -17,9 +17,9 @@ on:
         type: string
       testFilter:
         description: 'Add a filter expression when running the unit test projects'
-        required: false
+        required: true
         type: string
-        default: ''        
+     
 env:
   hostRoot: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host'
   host: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.csproj'
