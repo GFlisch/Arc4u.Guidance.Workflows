@@ -36,6 +36,10 @@ jobs:
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}.x
 
+      - name: Echo testFilter
+        run: |
+          echo "testFilter parameter is set to : ${{ github.event.inputs.testFilter }}"
+
       - name: Run Test projects matching *UnitTest.csproj
         if: github.event.inputs.testFilter == ''
         run: |
