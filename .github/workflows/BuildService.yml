@@ -40,16 +40,16 @@ jobs:
         run: dotnet restore ${{ env.host }}
 
       - name: Run Test projects matching *UnitTest.csproj
-        if:  ${{ github.event.inputs.testFilter == '' }}
-        shell: pwsh
+        if: ${{ github.event.inputs.testFilter == '' }}
         run: |
-            Get-ChildItem -Path test -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+            Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+        shell: pwsh            
 
       - name: Run Test projects matching *UnitTest.csproj with filter ${{ github.event.inputs.testFilter }}
-        if:  ${{ github.event.inputs.testFilter != '' }}
-        shell: pwsh
+        if: ${{ github.event.inputs.testFilter != '' }}
         run: |
-            Get-ChildItem -Path test -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
+            Get-ChildItem -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
+        shell: pwsh            
 
       - name: Build
         run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} --no-restore -o ./Service
