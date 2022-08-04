@@ -40,18 +40,18 @@ jobs:
         run: dotnet restore ${{ env.host }}
 
       - name: Run Test projects matching *UnitTest.csproj
-        if:  ${{ github.event.inputs.testFilter == '' }}
+        if:  ${{ github.event.inputs.testFilter = '' }}
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            Get-ChildItem -Path test -Filter *UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+            Get-ChildItem -Path test -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
 
       - name: Run Test projects matching *UnitTest.csproj with filter ${{ github.event.inputs.testFilter }}
         if:  ${{ github.event.inputs.testFilter != '' }}
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            Get-ChildItem -Path test -Filter *UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
+            Get-ChildItem -Path test -Filter *.${{ github.event.inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
 
       - name: Build
         run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} --no-restore -o ./Service
