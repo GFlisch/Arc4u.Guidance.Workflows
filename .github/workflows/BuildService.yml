@@ -40,7 +40,7 @@ jobs:
         run: dotnet restore ${{ env.host }}
 
       - name: Run Test projects matching *UnitTest.csproj
-        if:  ${{ github.event.inputs.testFilter = '' }}
+        if:  ${{ github.event.inputs.testFilter == '' }}
         uses: azure/powershell@v1
         with:
           inlineScript: |
