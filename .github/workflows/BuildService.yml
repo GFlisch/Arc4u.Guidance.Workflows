@@ -15,6 +15,11 @@ on:
         description: 'Version of the .Net runtime'     
         required: true
         type: string
+      testFilter:
+        description: 'Add a filter expression when running the unit test projects'
+        required: false
+        type: string
+        default: ''        
 env:
   hostRoot: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host'
   host: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.csproj'
@@ -33,7 +38,21 @@ jobs:
     
       - name: Install dependencies
         run: dotnet restore ${{ env.host }}
-         
+
+      - name: Run Test projects matching *UnitTest.csproj
+        if:  ${{ github.event.inputs.testFilter == '' }}
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Get-ChildItem -Path test -Filter *UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+
+      - name: Run Test projects matching *UnitTest.csproj with filter ${{ github.event.inputs.testFilter }}
+        if:  ${{ github.event.inputs.testFilter != '' }}
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Get-ChildItem -Path test -Filter *UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f  ${{ github.event.inputs.testFilter }} }
+
       - name: Build
         run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} --no-restore -o ./Service
 
