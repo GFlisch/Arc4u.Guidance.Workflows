@@ -49,7 +49,7 @@ jobs:
       - name: Run Test projects matching *UnitTest.csproj with filter ${{ inputs.testFilter }}
         if: inputs.testFilter != ''
         run: |
-            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} -f '${{ inputs.testFilter }}' }
+            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} --filter '${{ inputs.testFilter }}' }
         shell: pwsh            
 
       - name: Build
