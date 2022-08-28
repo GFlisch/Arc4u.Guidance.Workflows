@@ -1,7 +1,9 @@
 # Build Service
 
+Run all unit test project named *UnitTest.csproj
+
 Build a .NET Arc4u service and save it in an artifact.
-Don't run any test or Sonarqube analyzis.
+Don't run Sonarqube analyzis.
 
 Will be used by another workflow (Docker) to build a docker image and save it to a container registry.
 
