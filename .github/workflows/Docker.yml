@@ -61,8 +61,8 @@ jobs:
 
       - name: Build and publish the docker image.
         run: |
-          docker build ./Service -f ./Dockerfile -t ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }}
-          docker push ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }} 
+          docker build ./Service -f ./Dockerfile -t ${{ format('{0}_{1}', inputs.DockerImage, inputs.DockerImageTagVersion) }}
+          docker push ${{ format('{0}_{1}', inputs.DockerImage, inputs.DockerImageTagVersion) }} 
 
       - name: Docker Login
         uses: actions-hub/docker/login@master
@@ -74,9 +74,10 @@ jobs:
       - name: Tag built container with Azure Container Registry url
         uses: actions-hub/docker/cli@master
         with:
-          args: tag ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }} ${{ inputs.DockerImage + '_' +  inputs.DockerEnvironmentTagVersion }}
+          args: tag ${{ format('{0}_{1}', inputs.DockerImage, inputs.DockerImageTagVersion) }}  ${{ format('{0}_{1}', inputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
  
       - name: Push built container to Azure Container Registry
         uses: actions-hub/docker/cli@master
         with:
-          args: push ${{ inputs.DockerImage + '_' +  inputs.DockerEnvironmentTagVersion }}          
+          args: push ${{ format('{0}_{1}', inputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
+             
