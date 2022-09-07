@@ -3,10 +3,22 @@ name: Build a Docker image
 on: 
   workflow_call:
     inputs:
+      DockerContainer:
+        description: 'Docker container used to store the images'
+        required: true
+        type: string    
       DockerImage:
-        description: 'Docker image name use to store in a container'
+        description: 'Docker image name use to store in a container with no version Tag'
         required: true
         type: string
+      DockerImageTagVersion:
+        description: 'version Tag'
+        required: true
+        type: string     
+      DockerEnvironmentTagVersion:
+        description: 'Environment Tag: Dev - Test - Acc - Prod'
+        required: true
+        type: string            
       Registry:
         description: 'Name of the container registry'     
         required: true
@@ -49,5 +61,22 @@ jobs:
 
       - name: Build and publish the docker image.
         run: |
-          docker build ./Service -f ./Dockerfile -t ${{ inputs.DockerImage }}
-          docker push ${{ inputs.DockerImage }} 
+          docker build ./Service -f ./Dockerfile -t ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }}
+          docker push ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }} 
+
+      - name: Docker Login
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_REGISTRY_URL: ${{ inputs.DockerContainer }}
+          DOCKER_USERNAME: ${{ secrets.CR_User }}
+          DOCKER_PASSWORD: ${{ secrets.CR_Password }}
+
+      - name: Tag built container with Azure Container Registry url
+        uses: actions-hub/docker/cli@master
+        with:
+          args: tag ${{ inputs.DockerImage + '_' +  inputs.DockerImageTagVersion }} ${{ inputs.DockerImage + '_' +  inputs.DockerEnvironmentTagVersion }}
+ 
+      - name: Push built container to Azure Container Registry
+        uses: actions-hub/docker/cli@master
+        with:
+          args: push ${{ inputs.DockerImage + '_' +  inputs.DockerEnvironmentTagVersion }}          
