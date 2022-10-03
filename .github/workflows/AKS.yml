@@ -31,6 +31,11 @@ on:
         description: 'Name of the solution'     
         required: true
         type: string
+      DockerImageTagVersion:
+        description: 'version Tag'
+        required: true
+        type: string
+
     secrets:
       ACR_User:
         required: true
@@ -112,7 +117,7 @@ jobs:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
-          fullImagePath: '${{ format(''{0}:{1}_{2}'', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.Environment) }}'
+          fullImagePath: '${{ format(''{0}:{1}_{2}'', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.DockerImageTagVersion) }}'
       
       - name: Deploy
         run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}
