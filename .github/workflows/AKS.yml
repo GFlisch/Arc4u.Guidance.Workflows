@@ -31,10 +31,6 @@ on:
         description: 'Name of the solution'     
         required: true
         type: string
-      FullImagePath:
-        description: 'Name of the Image in the Container Registry'     
-        required: true
-        type: string
     secrets:
       ACR_User:
         required: true
@@ -105,6 +101,10 @@ jobs:
           _format-key: '#key#'
           environment: '${{ inputs.Environment }}'
 
+      - name: Ensure DockerImage name is in lower case!
+        run: echo "::set-output name=DockerImage::$(echo ${{ inputs.Registry }}/${{  inputs.solutionName }} | tr [:upper:] [:lower:])"
+        id: DockerImageToLower
+
       - name: Prepare the Deploy file => image tag.
         uses: bluwy/substitute-string-action@v1
         id: text
@@ -112,7 +112,7 @@ jobs:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
-          fullImagePath: '${{ inputs.FullImagePath }}'
+          fullImagePath: '${{ format('{0}:{1}_{2}', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.Environment) }}'
       
       - name: Deploy
         run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}
