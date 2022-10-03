@@ -112,7 +112,7 @@ jobs:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
-          fullImagePath: '${{ format('{0}:{1}_{2}', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.Environment) }}'
+          fullImagePath: '${{ format("{0}:{1}_{2}", steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.Environment) }}'
       
       - name: Deploy
         run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}
