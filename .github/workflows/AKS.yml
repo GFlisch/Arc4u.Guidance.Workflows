@@ -74,6 +74,10 @@ jobs:
         with:
           creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
+      - uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'v0.0.31'
+
       - uses: azure/aks-set-context@v2
         with:
            resource-group: '${{ inputs.ResourceGroup }}'
