@@ -82,9 +82,7 @@ jobs:
         with:
            resource-group: '${{ inputs.ResourceGroup }}'
            cluster-name: '${{ inputs.K8Cluster }}'
-           admin: false
-           use-kubelogin: true
-
+    
       - name: Create namespace.
         run: kubectl create namespace ${{ inputs.Namespace }}
         continue-on-error: true 
