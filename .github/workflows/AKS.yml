@@ -82,6 +82,7 @@ jobs:
         with:
            resource-group: '${{ inputs.ResourceGroup }}'
            cluster-name: '${{ inputs.K8Cluster }}'
+           admin: true
     
       - name: Create namespace.
         run: kubectl create namespace ${{ inputs.Namespace }}
