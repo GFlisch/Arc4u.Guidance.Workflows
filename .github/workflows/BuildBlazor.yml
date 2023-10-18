@@ -1,9 +1,9 @@
-name: Build .NET Service
+name: Build .NET Blazor App
 
 on: 
   workflow_call:
     inputs:
-      serviceName:
+      blazorAppName:
         description: 'Name of the service'     
         required: true
         type: string
@@ -21,8 +21,8 @@ on:
         type: string
      
 env:
-  hostRoot: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host'
-  host: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.csproj'
+  blazorRoot: './src/FE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}'
+  host: './src/BE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}.csproj'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'  
 
@@ -43,13 +43,13 @@ jobs:
       - name: Run Test projects matching *UnitTest.csproj
         if: inputs.testFilter == ''
         run: |
-            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
+            Get-ChildItem -Filter *.${{ inputs.blazorAppName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }}  }
         shell: pwsh            
 
       - name: Run Test projects matching *UnitTest.csproj with filter ${{ inputs.testFilter }}
         if: inputs.testFilter != ''
         run: |
-            Get-ChildItem -Filter *.${{ inputs.serviceName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} --filter '${{ inputs.testFilter }}' }
+            Get-ChildItem -Filter *.${{ inputs.blazorAppName }}.*UnitTest.csproj -Recurse | ForEach-Object { dotnet test $_.FullName -c ${{ env.buildConfiguration }} --filter '${{ inputs.testFilter }}' }
         shell: pwsh            
 
       - name: Build
@@ -61,7 +61,7 @@ jobs:
         with:
           _input-file: './src/BE/Dockerfile'
           _format-key: '%%key%%'
-          appName: ${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.dll
+          appName: ${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}.dll
       
       - name: Create Dockerfile
         uses: DamianReeves/write-file-action@v1.0
@@ -71,7 +71,7 @@ jobs:
           write-mode: append
 
       - name: Copy deploy file
-        run: cp ./src/BE/${{ github.event.inputs.serviceName }}/deploy.yml ./deploy.yml  
+        run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/deploy.yml ./deploy.yml  
 
       - name: Save artifacts
         uses: actions/upload-artifact@v3
