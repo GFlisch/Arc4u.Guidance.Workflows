@@ -74,7 +74,7 @@ jobs:
         run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/deploy.yml ./deploy.yml  
 
       - name: Move settings files to a config folder.
-        run: mv ${{ env.blazorRoot }}/wwwroot/appsettings*.json ./Service/Configs  
+        run: mv ${{ env.blazorRoot }}/wwwroot/appsettings*.json ./Service/Configs/  
 
       - name: Save artifacts
         uses: actions/upload-artifact@v3
