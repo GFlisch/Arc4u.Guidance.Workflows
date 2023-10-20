@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       blazorAppName:
-        description: 'Name of the service'     
+        description: 'Name of the blazor app'     
         required: true
         type: string
       solutionName:
@@ -15,6 +15,10 @@ on:
         description: 'Version of the .Net runtime'     
         required: true
         type: string
+      environment:
+          description: 'Define the  Environment: Prod, Acc, Test, Dev'     
+          required: true
+          type: string      
       testFilter:
         description: 'Add a filter expression when running the unit test projects'
         required: true
@@ -36,6 +40,10 @@ jobs:
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}
 
+      - name: Echo Download wasm tool
+        run: |
+          dotnet workload install wasm-tools-net7
+
       - name: Echo testFilter
         run: |
           echo "testFilter parameter is set to : ${{ inputs.testFilter }}"
@@ -53,25 +61,28 @@ jobs:
         shell: pwsh            
 
       - name: Build
-        run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
+        run: dotnet publish  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
 
-      - name: Substitue Dockerfile
+      - name: Substitue nginx file
         uses: bluwy/substitute-string-action@v1
         id: sub
         with:
-          _input-file: './src/BE/Dockerfile'
+          _input-file: './src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf'
           _format-key: '%%key%%'
-          appName: ${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}.dll
+          Environment: ${{ inputs.Environment }}
       
-      - name: Create Dockerfile
+      - name: Create nginx file
         uses: DamianReeves/write-file-action@v1.0
         with:
-          path: ./Dockerfile
+          path: ./nginx.cong
           contents: ${{ steps.sub.outputs.result }}
           write-mode: append
 
       - name: Copy deploy file
         run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/deploy.yml ./deploy.yml  
+      
+      - name: Copy Docker file
+        run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/Dockerfile ./Dockerfile          
 
       - name: Move settings files to a config folder.
         run:  | 
@@ -86,4 +97,5 @@ jobs:
             ./Service
             ./Dockerfile
             ./deploy.yml
+            ./nginx.conf
           retention-days: 1
