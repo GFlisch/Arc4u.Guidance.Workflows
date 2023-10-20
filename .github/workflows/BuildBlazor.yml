@@ -42,7 +42,7 @@ jobs:
 
       - name: Echo Download wasm tool
         run: |
-          dotnet workload install wasm-tools-net7
+          dotnet workload install wasm-tools
 
       - name: Echo testFilter
         run: |
