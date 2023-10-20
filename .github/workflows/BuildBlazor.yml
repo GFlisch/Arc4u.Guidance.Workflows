@@ -27,7 +27,6 @@ on:
 env:
   blazorRoot: './src/FE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}/'
   host: './src/FE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}.csproj'
-  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'  
 
 jobs:
@@ -43,6 +42,12 @@ jobs:
       - name: Echo Download wasm tool
         run: |
           dotnet workload install wasm-tools
+
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core 8 for the shared domain class
+        uses: actions/setup-dotnet@v1
+        with:
+            dotnet-version: 8.0.100-rc.2.23502.2
 
       - name: Echo testFilter
         run: |
@@ -61,7 +66,7 @@ jobs:
         shell: pwsh            
 
       - name: Build
-        run: dotnet publish  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
+        run: dotnet publish  ${{ env.host }}  -c ${{ env.buildConfiguration }} -o ./Service
 
       - name: Substitue nginx file
         uses: bluwy/substitute-string-action@v1
