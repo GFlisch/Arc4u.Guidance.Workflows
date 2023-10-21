@@ -63,6 +63,10 @@ jobs:
           username: ${{ secrets.CR_User }}
           password: ${{ secrets.CR_Password }}
 
+      - name: XDTesting Print Directory Structure
+        uses: FiorelaCiroku/XDTesting-Print-Directory-Structure@v1.0.2
+            
+
       - name: Build and publish the docker image.
         run: |
           docker build ./Service -f ./Dockerfile -t ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }}
