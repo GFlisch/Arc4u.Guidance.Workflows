@@ -53,7 +53,7 @@ jobs:
           path: ./Service/Configs
   
       - name: Ensure DockerImage name is in lower case!
-        run: echo "DockerImage={$(echo ${{ inputs.DockerImage }} | tr [:upper:] [:lower:])}" >> $GITHUB_OUTPUT
+        run: echo "DockerImage=$(echo ${{ inputs.DockerImage }} | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
         id: DockerImageToLower
 
       - name: Login to ACR
