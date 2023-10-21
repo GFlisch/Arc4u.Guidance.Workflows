@@ -15,6 +15,10 @@ on:
         description: 'Version of the .Net runtime'     
         required: true
         type: string
+      blazorWasm:
+        description: 'The Blazor workload to install.'
+        required: true
+        type: string
       environment:
           description: 'Define the  Environment: Prod, Acc, Test, Dev'     
           required: true
@@ -41,7 +45,7 @@ jobs:
 
       - name: Echo Download wasm tool
         run: |
-          dotnet workload install wasm-tools
+          dotnet workload install ${{ github.event.inputs.blazorWasm }}
 
       - uses: actions/checkout@v3
       - name: Setup .NET Core 8 for the shared domain class
@@ -92,7 +96,7 @@ jobs:
       - name: Move settings files to a config folder.
         run:  | 
             mkdir -p ./Service/Configs
-            mv ${{ env.blazorRoot }}/wwwroot/appsettings*.json ./Service/Configs  
+            mv ./Service/wwwroot/appsettings*.json ./Service/Configs  
 
       - name: Save artifacts
         uses: actions/upload-artifact@v3
@@ -102,5 +106,4 @@ jobs:
             ./Service
             ./Dockerfile
             ./deploy.yml
-            ./nginx.conf
           retention-days: 1
