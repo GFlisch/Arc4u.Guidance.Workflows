@@ -79,7 +79,7 @@ jobs:
       - name: Create nginx file
         uses: DamianReeves/write-file-action@v1.0
         with:
-          path: ./nginx.cong
+          path: ./nginx.conf
           contents: ${{ steps.sub.outputs.result }}
           write-mode: append
 
