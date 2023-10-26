@@ -97,7 +97,7 @@ jobs:
         continue-on-error: true 
 
       - name: Files to add in the configMap.
-        run: echo "::set-output name=configMapFiles::--from-file ./Service/Configs/appsettings.json --from-file ./Service/Configs/appsettings.${{ inputs.Environment }}.json $([ -e ./Service/Configs/reverseproxy.json ] && echo '--from-file ./Service/Configs/reverseproxy.json --from-file ./Service/Configs/reverseproxy.${{ inputs.Environment }}.json' || echo '')"
+        run: echo "::set-output name=configMapFiles::--from-file ./Service/Configs/appsettings.json --from-file ./Service/Configs/appsettings.${{ inputs.Environment }}.json $([ -e ./Service/Configs/reverseproxy.json ] && echo '--from-file ./Service/Configs/reverseproxy.json --from-file ./Service/Configs/reverseproxy.${{ inputs.Environment }}.json' || echo '') $([ -e ./Service/Configs/nginx.conf ] && echo '--from-file ./Service/Configs/nginx.conf' || echo '')"
         id: filesToConfigMap
 
       - name: Create/update configmap
