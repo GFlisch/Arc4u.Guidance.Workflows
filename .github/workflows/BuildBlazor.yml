@@ -72,13 +72,13 @@ jobs:
       - name: Build
         run: dotnet publish  ${{ env.host }}  -c ${{ env.buildConfiguration }} -o ./Service
 
-      - name: Substitue nginx file
-        uses: bluwy/substitute-string-action@v1
-        id: sub
-        with:
-          _input-file: './src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf'
-          _format-key: '%%key%%'
-          Environment: ${{ inputs.Environment }}
+      # - name: Substitue nginx file
+      #   uses: bluwy/substitute-string-action@v1
+      #   id: sub
+      #   with:
+      #     _input-file: './src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf'
+      #     _format-key: '%%key%%'
+      #     Environment: ${{ inputs.Environment }}
       
       - name: Create nginx file
         uses: DamianReeves/write-file-action@v1.0
