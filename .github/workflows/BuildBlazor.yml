@@ -98,6 +98,11 @@ jobs:
             mkdir -p ./Service/Configs
             mv ./Service/wwwroot/appsettings*.json ./Service/Configs  
 
+      - name: Move nginx.conf file to a config folder.
+        run:  | 
+            mkdir -p ./Service/Configs
+            mv ./src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf ./Service/Configs 
+
       - name: Save artifacts
         uses: actions/upload-artifact@v3
         with:
