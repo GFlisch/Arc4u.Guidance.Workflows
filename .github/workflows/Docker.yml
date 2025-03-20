@@ -34,12 +34,12 @@ jobs:
     outputs:
      fullImagePath: ${{ steps.imageTag.outputs.fullImagePath }}
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: artifact
 
       - name: Save artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: configs
           path: |
@@ -57,7 +57,7 @@ jobs:
         id: DockerImageToLower
 
       - name: Login to ACR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ inputs.Registry }}
           username: ${{ secrets.CR_User }}
