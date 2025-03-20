@@ -30,9 +30,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}
 
@@ -74,7 +74,7 @@ jobs:
         run: cp ./src/BE/${{ github.event.inputs.serviceName }}/deploy.yml ./deploy.yml  
 
       - name: Save artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact
           path: |
