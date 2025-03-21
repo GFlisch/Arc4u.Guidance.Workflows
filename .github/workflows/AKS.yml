@@ -93,7 +93,7 @@ jobs:
         id: configMap
 
       - name: Delete configmap if exist.
-        run: kubectl delete configmap  ${{ env.configMapName }} -n ${{ inputs.Namespace }}
+        run: kubectl delete configmap  ${{ steps.configMap.outputs.configMapName }} -n ${{ inputs.Namespace }}
         continue-on-error: true 
 
       - name: Files to add in the configMap.
