@@ -112,7 +112,7 @@ jobs:
           environment: '${{ inputs.Environment }}'
 
       - name: Ensure DockerImage name is in lower case!
-        run: echo "name=DockerImage::$(echo ${{ inputs.Registry }}/${{  inputs.solutionName }} | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
+        run: echo "DockerImage=$(echo ${{ inputs.Registry }}/${{  inputs.solutionName }} | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
         id: DockerImageToLower
 
       - name: Prepare the Deploy file => image tag.
