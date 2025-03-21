@@ -53,7 +53,8 @@ jobs:
           path: ./Service/Configs
   
       - name: Ensure DockerImage name is in lower case!
-        run: echo "name=DockerImage::$(echo ${{ inputs.DockerImage }} | tr [:upper:] [:lower:])" >> $GITHUB_ENV
+        run: echo "DockerImage=$(echo ${{ inputs.DockerImage }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        id: DockerImageToLower
 
       - name: Login to ACR
         uses: docker/login-action@v3
@@ -65,7 +66,7 @@ jobs:
       - name: Build and publish the docker image.
         run: |
           docker build ./Service -f ./Dockerfile -t ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }}
-          docker push ${{ format('{0}:{1}', env.DockerImage, inputs.DockerImageTagVersion) }} 
+          docker push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }} 
 
       - name: Docker Login
         uses: actions-hub/docker/login@master
@@ -82,4 +83,4 @@ jobs:
       - name: Push built container to Azure Container Registry
         uses: actions-hub/docker/cli@master
         with:
-          args: push ${{ format('{0}:{1}', env.DockerImage, inputs.DockerEnvironmentTagVersion) }}
+          args: push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
