@@ -93,7 +93,7 @@ jobs:
         id: configMap
 
       - name: Delete configmap if exist.
-        run: kubectl delete configmap  ${{ steps.configMap.outputs.configMapName }} -n ${{ inputs.Namespace }}
+        run: kubectl delete configmap  ${{ env.configMapName }} -n ${{ inputs.Namespace }}
         continue-on-error: true 
 
       - name: Files to add in the configMap.
@@ -101,7 +101,7 @@ jobs:
         id: filesToConfigMap
 
       - name: Create/update configmap
-        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} ${{ steps.filesToConfigMap.outputs.configMapFiles }}
+        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ env.configMapName }} ${{ env.configMapFiles }}
 
       - name: Prepare the Deploy file => environment.
         uses: bluwy/substitute-string-action@v1
