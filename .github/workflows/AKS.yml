@@ -104,7 +104,7 @@ jobs:
         run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} ${{ steps.filesToConfigMap.outputs.configMapFiles }}
 
       - name: Prepare the Deploy file => environment.
-        uses: bluwy/substitute-string-action@v1
+        uses: bluwy/substitute-string-action@v3
         with:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
@@ -116,13 +116,16 @@ jobs:
         id: DockerImageToLower
 
       - name: Prepare the Deploy file => image tag.
-        uses: bluwy/substitute-string-action@v1
+        uses: bluwy/substitute-string-action@v3
         id: text
         with:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
           fullImagePath: '${{ format(''{0}:{1}_{2}'', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.DockerImageTagVersion) }}'
+      
+      - name: Display deploy contents.
+        run: cat ./deploy.yml
       
       - name: Deploy
         run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}
