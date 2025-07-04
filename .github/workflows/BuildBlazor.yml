@@ -93,9 +93,8 @@ jobs:
         run:  | 
             mv ./src/FE/${{ github.event.inputs.blazorAppName }}/entrypoint.sh ./Service 
     
-
       - name: Save artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact
           path: |
