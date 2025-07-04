@@ -37,9 +37,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}
 
@@ -47,11 +47,11 @@ jobs:
         run: |
           dotnet workload install ${{ github.event.inputs.blazorWasm }}
 
-      - uses: actions/checkout@v3
-      - name: Setup .NET Core 8 for the shared domain class
-        uses: actions/setup-dotnet@v1
+      - uses: actions/checkout@v4
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: ${{ github.event.inputs.dotNet }}
+           dotnet-version: ${{ github.event.inputs.dotNet }}
 
       - name: Echo testFilter
         run: |
