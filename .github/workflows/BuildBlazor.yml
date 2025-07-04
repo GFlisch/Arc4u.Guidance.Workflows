@@ -15,10 +15,6 @@ on:
         description: 'Version of the .Net runtime'     
         required: true
         type: string
-      blazorWasm:
-        description: 'The Blazor workload to install.'
-        required: true
-        type: string
       environment:
           description: 'Define the  Environment: Prod, Acc, Test, Dev'     
           required: true
