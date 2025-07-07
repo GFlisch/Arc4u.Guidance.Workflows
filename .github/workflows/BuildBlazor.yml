@@ -25,8 +25,8 @@ on:
         type: string
      
 env:
-  blazorRoot: './src/FE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}/'
-  host: './src/FE/${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.blazorAppName }}.csproj'
+  blazorRoot: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/'
+  host: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}.csproj'
   buildConfiguration: 'Release'  
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
-           dotnet-version: ${{ github.event.inputs.dotNet }}
+           dotnet-version: ${{ inputs.dotNet }}
 
       - name: Echo testFilter
         run: |
@@ -80,10 +80,10 @@ jobs:
       #     write-mode: append
 
       - name: Copy deploy file
-        run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/deploy.yml ./deploy.yml  
+        run: cp ./src/FE/${{ inputs.blazorAppName }}/deploy.yml ./deploy.yml  
       
       - name: Copy Docker file
-        run: cp ./src/FE/${{ github.event.inputs.blazorAppName }}/Dockerfile ./Dockerfile          
+        run: cp ./src/FE/${{ inputs.blazorAppName }}/Dockerfile ./Dockerfile          
 
       - name: Move settings files to a config folder.
         run:  | 
@@ -93,11 +93,11 @@ jobs:
       - name: Move nginx.conf file to a config folder.
         run:  | 
             mkdir -p ./Service/Configs
-            mv ./src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf ./Service/Configs 
+            mv ./src/FE/${{ inputs.blazorAppName }}/nginx.conf ./Service/Configs 
 
       - name: Move entrypoint.sh file to a config folder.
         run:  | 
-            mv ./src/FE/${{ github.event.inputs.blazorAppName }}/entrypoint.sh ./Service 
+            mv ./src/FE/${{ inputs.blazorAppName }}/entrypoint.sh ./Service 
     
       - name: Save artifacts
         uses: actions/upload-artifact@v4
