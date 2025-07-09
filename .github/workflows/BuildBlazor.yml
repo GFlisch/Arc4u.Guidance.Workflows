@@ -39,16 +39,6 @@ jobs:
         with:
            dotnet-version: ${{ inputs.dotNet }}
 
-      - name: Echo testFilter
-        run: |
-          echo "testFilter parameter is set to : ${{ inputs.testFilter }}"
-          echo "blazorAppName parameter is set to : ${{ inputs.blazorAppName }}"
-          echo "solutionName parameter is set to : ${{ inputs.solutionName }}"
-          echo "environment parameter is set to : ${{ inputs.environment }}"
-          echo "blazorRoot is set to : ${{ env.blazorRoot }}"
-          echo "host is set to : ${{ env.host }}"
-          echo "buildConfiguration is set to : ${{ env.buildConfiguration }}"
-
       - name: Run Test projects matching *UnitTest.csproj
         if: inputs.testFilter == ''
         run: |
@@ -88,7 +78,7 @@ jobs:
       - name: Move settings files to a config folder.
         run:  | 
             mkdir -p ./Service/Configs
-            mv ./Service/wwwroot/appsettings*.json ./Service/Configs  
+            mv ./Service/wwwroot/appsettings*.json* ./Service/Configs  
 
       # - name: Move nginx.conf file to a config folder.
       #   run:  | 
