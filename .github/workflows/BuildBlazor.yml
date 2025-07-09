@@ -95,9 +95,9 @@ jobs:
             mkdir -p ./Service/Configs
             mv ./src/FE/${{ inputs.blazorAppName }}/nginx.conf ./Service/Configs 
 
-      - name: Move entrypoint.sh file to a config folder.
-        run:  | 
-            mv ./src/FE/${{ inputs.blazorAppName }}/entrypoint.sh ./Service 
+      # - name: Move entrypoint.sh file to a config folder.
+      #   run:  | 
+      #       mv ./src/FE/${{ inputs.blazorAppName }}/entrypoint.sh ./Service 
     
       - name: Save artifacts
         uses: actions/upload-artifact@v4
