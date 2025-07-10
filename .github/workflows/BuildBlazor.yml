@@ -68,7 +68,9 @@ jobs:
       #     path: ./Service/nginx.conf
       #     contents: ${{ steps.sub.outputs.result }}
       #     write-mode: append
-
+      - name: Copy nginx file
+        run: cp ./src/FE/${{ inputs.blazorAppName }}/nginx.conf ./nginx.conf  
+      
       - name: Copy deploy file
         run: cp ./src/FE/${{ inputs.blazorAppName }}/deploy.yml ./deploy.yml  
       
@@ -96,5 +98,6 @@ jobs:
           path: |
             ./Service
             ./Dockerfile
+            ./nginx.conf
             ./deploy.yml
           retention-days: 1
