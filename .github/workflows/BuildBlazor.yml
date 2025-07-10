@@ -68,8 +68,12 @@ jobs:
       #     path: ./Service/nginx.conf
       #     contents: ${{ steps.sub.outputs.result }}
       #     write-mode: append
+
+      # Add the nginx.conf file at the level of the Service folder.
+      # The Docker.yml is building the Dockerfile with the folder content of the Service folder!
+      # This is the job of the Dockerfile to remove the nginx.conf file from the Service folder and copy it to the /etc/nginx folder.
       - name: Copy nginx file
-        run: cp ./src/FE/${{ inputs.blazorAppName }}/nginx.conf ./nginx.conf  
+        run: cp ./src/FE/${{ inputs.blazorAppName }}/nginx.conf ./Service/nginx.conf  
       
       - name: Copy deploy file
         run: cp ./src/FE/${{ inputs.blazorAppName }}/deploy.yml ./deploy.yml  
