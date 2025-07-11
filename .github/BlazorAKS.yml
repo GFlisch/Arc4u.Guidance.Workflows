@@ -1,0 +1,137 @@
+name: AKS
+
+on: 
+  workflow_call:
+    inputs:
+      Registry:
+        description: 'Name of the ACR registry'     
+        required: true
+        type: string
+      Namespace:
+        description: 'Kubernetes Namespace'     
+        required: true
+        type: string
+      ResourceGroup:
+        description: 'Kubernetes Namespace'     
+        required: true
+        type: string
+      K8Cluster:
+        description: 'Kubernetes cluster name'     
+        required: true
+        type: string
+      Environment:
+        description: 'Define the  Environment: Prod, Acc, Test, Dev'     
+        required: true
+        type: string
+      ServiceName:
+        description: 'Name of the service'     
+        required: true
+        type: string
+      SolutionName:
+        description: 'Name of the solution'     
+        required: true
+        type: string
+      DockerImageTagVersion:
+        description: 'version Tag'
+        required: true
+        type: string
+
+    secrets:
+      ACR_User:
+        required: true
+      ACR_Password:
+        required: true
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_CLIENT_SECRET:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+
+env:
+  configMap: ${{ inputs.ServiceName }}Settings
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: configs
+
+      - name: Login to ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.Registry }}
+          username: ${{ secrets.ACR_User }}
+          password: ${{ secrets.ACR_Password }}
+  
+      - uses: azure/setup-kubectl@v2.0
+
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+
+      - uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'v0.0.31'
+
+      - uses: azure/aks-set-context@v2
+        with:
+           resource-group: '${{ inputs.ResourceGroup }}'
+           cluster-name: '${{ inputs.K8Cluster }}'
+           admin: true
+    
+      - name: Create namespace.
+        run: kubectl create namespace ${{ inputs.Namespace }}
+        continue-on-error: true 
+
+      - name: Ensure configmap name is in lower case!
+        run: echo "configMapName=$(echo ${{ env.configMap }} | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
+        id: configMap
+
+      - name: Delete configmap if exist.
+        run: kubectl delete configmap  ${{ steps.configMap.outputs.configMapName }} -n ${{ inputs.Namespace }}
+        continue-on-error: true 
+
+      - name: Prepare config files for configmap (rename environment to Production)
+        run: |
+          mkdir -p ./Service/Configmap
+          cp ./Service/Configs/appsettings.json* ./Service/Configmap/
+                    cp ./Service/Configs/appsettings.json* ./Service/Configmap/ 2>/dev/null || true
+          for f in ./Service/Configs/appsettings.${{ inputs.Environment }}.json*; do
+            [ -e "$f" ] && cp "$f" "./Service/Configmap/appsettings.Production${f##*.json}"
+          done
+        id: filesToConfigMap
+
+      - name: Create/update configmap
+        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} ${{ steps.filesToConfigMap.outputs.configMapFiles }}
+
+      - name: Prepare the Deploy file => environment.
+        uses: bluwy/substitute-string-action@v3
+        with:
+          _input-file: 'deploy.yml'
+          _output-file: 'deploy.yml'
+          _format-key: '#key#'
+          environment: '${{ inputs.Environment }}'
+
+      - name: Ensure DockerImage name is in lower case!
+        run: echo "DockerImage=$(echo ${{ inputs.Registry }}/${{  inputs.solutionName }} | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
+        id: DockerImageToLower
+
+      - name: Prepare the Deploy file => image tag.
+        uses: bluwy/substitute-string-action@v3
+        id: text
+        with:
+          _input-file: 'deploy.yml'
+          _output-file: 'deploy.yml'
+          _format-key: '#key#'
+          fullImagePath: '${{ format(''{0}:{1}_{2}'', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.DockerImageTagVersion) }}'
+      
+      - name: Display deploy contents.
+        run: cat ./deploy.yml
+      
+      - name: Deploy
+        run: kubectl apply -f ./deploy.yml -n ${{ inputs.Namespace }}
