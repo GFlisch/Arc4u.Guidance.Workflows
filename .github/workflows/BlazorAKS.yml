@@ -104,16 +104,8 @@ jobs:
             [ -e "$f" ] && cp "$f" "./Service/Configmap/appsettings.Production${f##*.json}"
           done
 
-      - name: Files to add in the configMap.
-        run: |
-          echo "configMapFiles="
-          for f in ./Service/Configmap; do
-            echo "--from-file $f "
-          done        
-        id: filesToConfigMap
-
       - name: Create/update configmap
-        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} ${{ steps.filesToConfigMap.outputs.configMapFiles }}
+        run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} --from-file=./Service/Configmap
 
       - name: Prepare the Deploy file => environment.
         uses: bluwy/substitute-string-action@v3
