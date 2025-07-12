@@ -101,12 +101,13 @@ jobs:
           mkdir -p ./Service/Configmap
           cp ./Service/Configs/appsettings.json* ./Service/Configmap/
           for f in ./Service/Configs/appsettings.${{ inputs.Environment }}.json*; do
-            cp "$f" "./Service/Configmap/appsettings.Production${f##*.json}"
+            ext="${f##*.json}"                # will be "", ".br", ".gz", etc
+            cp "$f" "./Service/Configmap/appsettings.Production.json$ext"
           done
 
       - name: List files in Configmap folder
         run: ls -l ./Service/Configmap
-                  
+
       - name: Create/update configmap
         run: kubectl create configmap -n ${{ inputs.Namespace }}  ${{ steps.configMap.outputs.configMapName }} --from-file=./Service/Configmap
 
