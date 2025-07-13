@@ -54,20 +54,9 @@ jobs:
       - name: Build
         run: dotnet publish  ${{ env.host }}  -c ${{ env.buildConfiguration }} -o ./Service
 
-      # - name: Substitue nginx file
-      #   uses: bluwy/substitute-string-action@v1
-      #   id: sub
-      #   with:
-      #     _input-file: './src/FE/${{ github.event.inputs.blazorAppName }}/nginx.conf'
-      #     _format-key: '%%key%%'
-      #     Environment: ${{ inputs.Environment }}
-      
-      # - name: Create nginx file
-      #   uses: DamianReeves/write-file-action@v1.0
-      #   with:
-      #     path: ./Service/nginx.conf
-      #     contents: ${{ steps.sub.outputs.result }}
-      #     write-mode: append
+      - name: Download Brotoli decode.min.js
+        run: |
+          curl -L https://raw.githubusercontent.com/google/brotli/master/js/decode.min.js -o ./Service/wwwroot/decode.min.js
 
       # Add the nginx.conf file at the level of the Service folder.
       # The Docker.yml is building the Dockerfile with the folder content of the Service folder!
