@@ -23,8 +23,8 @@ on:
         description: 'Define the  Environment: Prod, Acc, Test, Dev'     
         required: true
         type: string
-      ServiceName:
-        description: 'Name of the service'     
+      BlazorAppName:
+        description: 'Name of the blazor app'     
         required: true
         type: string
       SolutionName:
@@ -51,7 +51,7 @@ on:
         required: true
 
 env:
-  configMap: ${{ inputs.ServiceName }}Settings
+  configMap: ${{ inputs.BlazorAppName }}Settings
 
 jobs:
   build:
@@ -130,7 +130,7 @@ jobs:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
-          fullImagePath: '${{ format(''{0}:{1}_{2}'', steps.DockerImageToLower.outputs.DockerImage, inputs.ServiceName, inputs.DockerImageTagVersion) }}'
+          fullImagePath: "${{ format('{0}:{1}_{2}', steps.DockerImageToLower.outputs.DockerImage, inputs.BlazorAppName, inputs.DockerImageTagVersion) }}""
       
       - name: Display deploy contents.
         run: cat ./deploy.yml
