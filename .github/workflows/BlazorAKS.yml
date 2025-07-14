@@ -130,7 +130,7 @@ jobs:
           _input-file: 'deploy.yml'
           _output-file: 'deploy.yml'
           _format-key: '#key#'
-          fullImagePath: "${{ format('{0}:{1}_{2}', steps.DockerImageToLower.outputs.DockerImage, inputs.BlazorAppName, inputs.DockerImageTagVersion) }}""
+          fullImagePath: "${{ format('{0}:{1}_{2}', steps.DockerImageToLower.outputs.DockerImage, inputs.BlazorAppName, inputs.DockerImageTagVersion) }}"
       
       - name: Display deploy contents.
         run: cat ./deploy.yml
