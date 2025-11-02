@@ -53,7 +53,7 @@ jobs:
         shell: pwsh            
 
       - name: Build
-        run: dotnet build  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
+        run: dotnet publish  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
 
       - name: Substitue Dockerfile
         uses: bluwy/substitute-string-action@v1
