@@ -30,9 +30,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}
 
@@ -56,7 +56,7 @@ jobs:
         run: dotnet publish  ${{ env.host }}  --configuration ${{ env.buildConfiguration }} -o ./Service
 
       - name: Substitue Dockerfile
-        uses: bluwy/substitute-string-action@v1
+        uses: bluwy/substitute-string-action@v3
         id: sub
         with:
           _input-file: './src/BE/Dockerfile'
@@ -64,7 +64,7 @@ jobs:
           appName: ${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.dll
       
       - name: Create Dockerfile
-        uses: DamianReeves/write-file-action@v1.0
+        uses: DamianReeves/write-file-action@v1.3
         with:
           path: ./Dockerfile
           contents: ${{ steps.sub.outputs.result }}
@@ -74,7 +74,7 @@ jobs:
         run: cp ./src/BE/${{ github.event.inputs.serviceName }}/deploy.yml ./deploy.yml  
 
       - name: Save artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: artifact
           path: |

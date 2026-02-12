@@ -57,20 +57,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: configs
 
       - name: Login to ACR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ inputs.Registry }}
           username: ${{ secrets.ACR_User }}
           password: ${{ secrets.ACR_Password }}
   
-      - uses: azure/setup-kubectl@v2.0
+      - uses: azure/setup-kubectl@v4
 
-      - uses: Azure/login@v1
+      - uses: Azure/login@v2
         with:
           creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
@@ -78,7 +78,7 @@ jobs:
         with:
           kubelogin-version: 'v0.0.31'
 
-      - uses: azure/aks-set-context@v2
+      - uses: azure/aks-set-context@v4
         with:
            resource-group: '${{ inputs.ResourceGroup }}'
            cluster-name: '${{ inputs.K8Cluster }}'

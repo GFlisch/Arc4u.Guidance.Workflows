@@ -34,12 +34,12 @@ jobs:
     outputs:
      fullImagePath: ${{ steps.imageTag.outputs.fullImagePath }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: artifact
 
       - name: Save artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: configs
           path: |
@@ -48,9 +48,7 @@ jobs:
           retention-days: 90
           
       - name: Remove Folder
-        uses: JesseTG/rm@v1.0.3
-        with:
-          path: ./Service/Configs
+        run: rm -rf ./Service/Configs
   
       - name: Ensure DockerImage name is in lower case!
         run: echo "DockerImage=$(echo ${{ inputs.DockerImage }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
