@@ -67,18 +67,14 @@ jobs:
           docker push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }} 
 
       - name: Docker Login
-        uses: actions-hub/docker/login@master
-        env:
-          DOCKER_REGISTRY_URL: ${{ inputs.DockerContainer }}
-          DOCKER_USERNAME: ${{ secrets.CR_User }}
-          DOCKER_PASSWORD: ${{ secrets.CR_Password }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.DockerContainer }}
+          username: ${{ secrets.CR_User }}
+          password: ${{ secrets.CR_Password }}
 
       - name: Tag built container with Azure Container Registry url
-        uses: actions-hub/docker/cli@master
-        with:
-          args: tag ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }}  ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
- 
+        run: docker tag ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }} ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
+
       - name: Push built container to Azure Container Registry
-        uses: actions-hub/docker/cli@master
-        with:
-          args: push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
+        run: docker push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
