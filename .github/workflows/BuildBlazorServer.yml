@@ -1,0 +1,60 @@
+name: Build .NET Blazor App
+
+on: 
+  workflow_call:
+    inputs:
+      blazorAppName:
+        description: 'Name of the blazor app'     
+        required: true
+        type: string
+      solutionName:
+        description: 'Name of the solution'     
+        required: true
+        type: string
+      dotNet:
+        description: 'Version of the .Net runtime'     
+        required: true
+        type: string
+      environment:
+          description: 'Define the  Environment: Prod, Acc, Test, Dev'     
+          required: true
+          type: string      
+     
+env:
+  blazorRoot: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/'
+  host: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}.csproj'
+  buildConfiguration: 'Release'  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+           dotnet-version: ${{ inputs.dotNet }}          
+
+      - name: Build
+        run: dotnet publish  ${{ env.host }}  -c ${{ env.buildConfiguration }} -o ./Service /p:UseAppHost=false
+
+      # The Docker.yml is building the Dockerfile with the folder content of the Service folder!
+      - name: Copy Docker file
+        run: cp ${{ env.blazorRoot }}/Dockerfile ./Dockerfile          
+
+      - name: Remove the configs from the Service folder.
+        run:  | 
+            rm -rf ./Service/configs
+  
+      - name: Remove the appsettings.* from wwwroot folder.
+        run:  | 
+            rm -f ./Service/wwwroot/appsettings*
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: artifact
+          path: |
+            ./Service
+            ./Dockerfile
+          retention-days: 1
