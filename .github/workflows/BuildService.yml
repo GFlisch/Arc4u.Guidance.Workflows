@@ -57,7 +57,7 @@ jobs:
 
       - name: Register private NuGet source
         if: ${{ inputs.nuget-source-url != '' }}
-        uses: ./.github/actions/register-nuget-source
+        uses: GFlisch/Arc4u.Guidance.Workflows/.github/actions/register-nuget-source@v10
         with:
           source-url: ${{ inputs.nuget-source-url }}
           source-name: ${{ inputs.nuget-source-name }}
