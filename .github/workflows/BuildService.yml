@@ -19,7 +19,26 @@ on:
         description: 'Add a filter expression when running the unit test projects'
         required: true
         type: string
-     
+      nuget-source-url:
+        description: 'URL of the private NuGet feed'
+        required: false
+        type: string
+        default: ''
+      nuget-source-name:
+        description: 'Name for the NuGet source'
+        required: false
+        type: string
+        default: 'PrivateFeed'
+      nuget-username:
+        description: 'Username for NuGet authentication'
+        required: false
+        type: string
+        default: 'az'
+    secrets:
+      AUTH_NUGET_PASSWORD:
+        description: 'PAT for authenticating to the private NuGet feed'
+        required: false
+
 env:
   hostRoot: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host'
   host: './src/BE/${{ github.event.inputs.serviceName }}/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host/${{ github.event.inputs.solutionName }}.${{ github.event.inputs.serviceName }}.Host.csproj'
@@ -35,6 +54,15 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
            dotnet-version: ${{ github.event.inputs.dotNet }}
+
+      - name: Register private NuGet source
+        if: ${{ inputs.nuget-source-url != '' }}
+        uses: ./.github/actions/register-nuget-source
+        with:
+          source-url: ${{ inputs.nuget-source-url }}
+          source-name: ${{ inputs.nuget-source-name }}
+          username: ${{ inputs.nuget-username }}
+          password: ${{ secrets.AUTH_NUGET_PASSWORD }}
 
       - name: Echo testFilter
         run: |

@@ -18,8 +18,27 @@ on:
       environment:
           description: 'Define the  Environment: Prod, Acc, Test, Dev'     
           required: true
-          type: string      
-     
+          type: string
+      nuget-source-url:
+        description: 'URL of the private NuGet feed'
+        required: false
+        type: string
+        default: ''
+      nuget-source-name:
+        description: 'Name for the NuGet source'
+        required: false
+        type: string
+        default: 'PrivateFeed'
+      nuget-username:
+        description: 'Username for NuGet authentication'
+        required: false
+        type: string
+        default: 'az'
+    secrets:
+      AUTH_NUGET_PASSWORD:
+        description: 'PAT for authenticating to the private NuGet feed'
+        required: false
+
 env:
   blazorRoot: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/'
   host: './src/FE/${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}/${{ inputs.solutionName }}.${{ inputs.blazorAppName }}.csproj'
@@ -33,7 +52,16 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
-           dotnet-version: ${{ inputs.dotNet }}          
+           dotnet-version: ${{ inputs.dotNet }}
+
+      - name: Register private NuGet source
+        if: ${{ inputs.nuget-source-url != '' }}
+        uses: ./.github/actions/register-nuget-source
+        with:
+          source-url: ${{ inputs.nuget-source-url }}
+          source-name: ${{ inputs.nuget-source-name }}
+          username: ${{ inputs.nuget-username }}
+          password: ${{ secrets.AUTH_NUGET_PASSWORD }}
 
       - name: Build
         run: dotnet publish  ${{ env.host }}  -c ${{ env.buildConfiguration }} -o ./Service /p:UseAppHost=false

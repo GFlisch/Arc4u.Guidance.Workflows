@@ -1,0 +1,30 @@
+name: 'Register Private NuGet Source'
+description: 'Adds a private NuGet feed to the dotnet NuGet configuration'
+
+inputs:
+  source-name:
+    description: 'Name for the NuGet source'
+    required: false
+    default: 'PrivateFeed'
+  source-url:
+    description: 'URL of the private NuGet feed'
+    required: true
+  username:
+    description: 'Username for authentication'
+    required: false
+    default: 'az'
+  password:
+    description: 'PAT or password for authentication'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Register private NuGet source
+      shell: bash
+      run: |
+        dotnet nuget add source "${{ inputs.source-url }}" \
+          --name "${{ inputs.source-name }}" \
+          --username "${{ inputs.username }}" \
+          --password "${{ inputs.password }}" \
+          --store-password-in-clear-text
