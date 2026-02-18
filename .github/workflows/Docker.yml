@@ -19,13 +19,15 @@ on:
         description: 'Environment Tag: Dev - Test - Acc - Prod'
         required: true
         type: string            
-      Registry:
+      CR_Registry:
         description: 'Name of the container registry'     
         required: true
         type: string
-    secrets:
       CR_User:
+        description: 'container registry name'     
         required: true
+        type: string        
+    secrets:
       CR_Password:
         required: true
 jobs:
