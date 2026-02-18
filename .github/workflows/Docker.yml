@@ -59,8 +59,8 @@ jobs:
       - name: Login to ACR
         uses: docker/login-action@v3
         with:
-          registry: ${{ inputs.Registry }}
-          username: ${{ secrets.CR_User }}
+          registry: ${{ inputs.CR_Registry }}
+          username: ${{ inputs.CR_User }}
           password: ${{ secrets.CR_Password }}
 
       - name: Build and publish the docker image.
@@ -68,15 +68,9 @@ jobs:
           docker build ./Service -f ./Dockerfile -t ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }}
           docker push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }} 
 
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.DockerContainer }}
-          username: ${{ secrets.CR_User }}
-          password: ${{ secrets.CR_Password }}
-
       - name: Tag built container with Azure Container Registry url
         run: docker tag ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerImageTagVersion) }} ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
 
       - name: Push built container to Azure Container Registry
         run: docker push ${{ format('{0}:{1}', steps.DockerImageToLower.outputs.DockerImage, inputs.DockerEnvironmentTagVersion) }}
+          
